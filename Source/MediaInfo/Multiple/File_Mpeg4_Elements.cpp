@@ -9039,37 +9039,37 @@ void File_Mpeg4::moov_udta_xxxx()
             {
                 Element_Name("Text");
 
-                //Parsing
-                Ztring Value;
-                int32u Size32=0;
-                int16u Size16=0, Language;
-                bool IsText=true;
-                if (Element_Size<=4)
-                    IsText=false;
-                else
-                {
-                    Peek_B4(Size32);
-                    if (4+(int64u)Size32>Element_Size)
-                    {
-                        Size32=0;
-                        Peek_B2(Size16);
-                        if (4+(int64u)Size16>Element_Size)
-                            IsText=false;
-                    }
-                }
-                if (!IsText)
-                {
-                    Skip_XX(Element_Size,                       "Unknown");
-                    return;
-                }
-
                 while(Element_Offset<Element_Size)
                 {
+                    //Parsing
+                    Ztring Value;
+                    int32u Size32=0;
+                    int16u Size16=0, Language;
+                    bool IsText=true;
+                    if (Element_Size<=Element_Offset+4)
+                        IsText=false;
+                    else
+                    {
+                        Peek_B4(Size32);
+                        if (Element_Offset+4+(int64u)Size32>Element_Size)
+                        {
+                            Size32=0;
+                            Peek_B2(Size16);
+                            if (Element_Offset+4+(int64u)Size16>Element_Size)
+                                IsText=false;
+                        }
+                    }
+                    if (!IsText)
+                    {
+                        Skip_XX(Element_Size-Element_Offset,                       "Unknown");
+                        return;
+                    }
+
                     std::string ValueS;
                     if (Size32)
                     {
-                        Get_String(Size32, ValueS,              "Value");
                         Get_B4 (Size32,                         "Size");
+                        Get_String(Size32, ValueS,              "Value");
                     }
                     else
                     {
